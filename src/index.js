@@ -110,7 +110,6 @@ const getAddressHtml = cep => {
 
 const getAddressFromService = cep => {
   return new Promise((resolve, reject) => {
-    postalCodeServiceUrl
     request.get({url: postalCodeServiceUrl(cep)}, (err, httpResponse, body) => {
       const result = JSON.parse(body);
       if (err) {

@@ -16,6 +16,7 @@
     "mocha": "^4.0.1",
     "npm-run-all": "^4.1.2"
   },
+  "bundleDependencies": false,
   "scripts": {
     "lint": "esw src --color",
     "lint:watch": "npm run lint -- --watch",
