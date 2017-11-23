@@ -1,0 +1,30 @@
+{
+  "name": "cep-finder",
+  "version": "0.1.0",
+  "description": "Easy CEP (brazilian postal code) finder",
+  "main": "src/index.js",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "detect-node": "^2.0.3",
+    "request": "^2.83.0"
+  },
+  "devDependencies": {
+    "babel-register": "6.16.3",
+    "chai": "^4.1.2",
+    "eslint": "^4.11.0",
+    "eslint-watch": "^3.1.3",
+    "mocha": "^4.0.1",
+    "npm-run-all": "^4.1.2"
+  },
+  "scripts": {
+    "lint": "esw src --color",
+    "lint:watch": "npm run lint -- --watch",
+    "test": "mocha --reporter progress \"src/**/*.test.js\"",
+    "test:lint": "npm-run-all --parallel test lint"
+  },
+  "author": {
+    "name": "Jorge Luis Iten Júnior",
+    "email": "jorgeiten@gmail.com"
+  },
+  "license": "MIT"
+}
