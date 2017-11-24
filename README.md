@@ -21,15 +21,15 @@ const cepFinder = require("cep-finder");
 cepFinder("01311300").then(result => console.log(result));
 ```
 
-will produce the following JSON:
-```json
+will produce the following object:
+```js
 {
-    logradouro: 'Avenida Paulista',
-    complemento: 'de 1867 ao fim - lado ímpar',
-    bairro: 'Bela Vista',
-    cidade: 'São Paulo',
-    estado: 'SP',
-    cep: '01311-300'
+    logradouro: "Avenida Paulista",
+    complemento: "de 1867 ao fim - lado ímpar",
+    bairro: "Bela Vista",
+    cidade: "São Paulo",
+    estado: "SP",
+    cep: "01311-300"
 }
 ```
 
