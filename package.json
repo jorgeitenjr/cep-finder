@@ -1,6 +1,6 @@
 {
   "name": "cep-finder",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Easy CEP (brazilian postal code) finder",
   "main": "src/index.js",
   "dependencies": {
