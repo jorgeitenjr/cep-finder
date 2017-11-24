@@ -1,13 +1,13 @@
-const request = require('request');
+const axios = require('axios');
 const cheerio = require('cheerio');
 const isNode = require('detect-node');
+const qs = require('qs');
 
 const defaultUrl = 'http://www.buscacep.correios.com.br/sistemas/buscacep/resultadoBuscaCepEndereco.cfm';
 const postalCodeServiceUrl = postalCode => `https://viacep.com.br/ws/${postalCode}/json/`;
 
 const search = ".tmptabela tr";
 const subSearch = "td";
-const encoding = 'binary';
 const splitCharCityState = "/";
 const splitCharStreet = "-";
 const pattern = "^\\d{5}-?\\d{3}$";
@@ -33,7 +33,7 @@ const map = {
 
 const cepKey = "relaxation";
 
-const formData = {
+const params = {
   "semelhante": "N",
   "tipoCEP": "ALL"
 };
@@ -87,14 +87,18 @@ const getAddressHtml = cep => {
   return new Promise((resolve, reject) => {
     const cepToFind = {};
     cepToFind[cepKey] = cep;
-    request.post(
-      {
-        url: defaultUrl,
-        encoding: encoding,
-        form: Object.assign(formData, cepToFind)
-      }, (err, httpResponse, html) => {
-        if (!err && httpResponse.statusCode == 200) {
-          const data = cheerio.load(html);
+    const authOptions = {
+      headers: {
+        'Content-Type': `application/x-www-form-urlencoded`,
+      },
+      responseType: 'arraybuffer'
+    };
+    axios.post(
+      defaultUrl, qs.stringify(Object.assign(params, {"relaxation": cep})), authOptions).then((response) => {
+        const toParse = new Buffer(response.data, 'ISO-8859-1').toString();
+        console.log(toParse);
+        if (response.status == 200) {
+          const data = cheerio.load(toParse);
           const handled = handleHtmlData(data);
           if (Object.keys(handled).length === 0) {
             resolve(cepNotFound(cep));
@@ -110,9 +114,9 @@ const getAddressHtml = cep => {
 
 const getAddressFromService = cep => {
   return new Promise((resolve, reject) => {
-    request.get({url: postalCodeServiceUrl(cep)}, (err, httpResponse, body) => {
-      const result = JSON.parse(body);
-      if (err) {
+    axios.get(postalCodeServiceUrl(cep)).then((response) => {
+      const result = response.data;
+      if (response.status != 200) {
         reject(unableToFindCep(cep));
       }
       if (result.erro) {

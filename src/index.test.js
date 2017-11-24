@@ -17,6 +17,7 @@ describe('CepFinder', function () {
 
 
     cepFinder("89010000").then(result => {
+      console.log(result);
       expect(result).to.deep.equal(expectedObject);
       done();
     });

@@ -4,9 +4,10 @@
   "description": "Easy CEP (brazilian postal code) finder",
   "main": "src/index.js",
   "dependencies": {
+    "axios": "^0.17.1",
     "cheerio": "^1.0.0-rc.2",
     "detect-node": "^2.0.3",
-    "request": "^2.83.0"
+    "qs": "^6.5.1"
   },
   "devDependencies": {
     "babel-register": "6.16.3",
