@@ -1,7 +1,7 @@
+const axios = require('axios');
 const cheerio = require('cheerio');
 const isNode = require('detect-node');
-const got = require('got');
-const FormData = require('form-data');
+const qs = require('qs');
 
 const defaultUrl = 'http://www.buscacep.correios.com.br/sistemas/buscacep/resultadoBuscaCepEndereco.cfm';
 const postalCodeServiceUrl = postalCode => `https://viacep.com.br/ws/${postalCode}/json/`;
@@ -32,6 +32,11 @@ const map = {
 };
 
 const cepKey = "relaxation";
+
+const params = {
+  "semelhante": "N",
+  "tipoCEP": "ALL"
+};
 
 const handleHtmlData = data => {
   const result = {};
@@ -78,55 +83,51 @@ const getAddress = async (cep, type) =>
     : invalidValid(cep);
 
 
-const getAddressHtml = async cep => {
+const getAddressHtml = cep => {
   return new Promise((resolve, reject) => {
-    const form = new FormData();
-    form.append("semelhante", "N");
-    form.append("tipoCEP", "ALL");
-    form.append('relaxation', cep);
     const cepToFind = {};
     cepToFind[cepKey] = cep;
-    got(defaultUrl, {method: 'POST', body: form, encoding: 'binary'})
-      .then(response => {
-        if (response.statusCode != 200) {
+    const authOptions = {
+      responseType: 'arraybuffer'
+    };
+    axios.post(
+      defaultUrl, qs.stringify(Object.assign(params, {"relaxation": cep})), authOptions).then((response) => {
+
+        if (response.status == 200) {
+          const arrayBuffer = new Buffer(response.data);
+          const data = cheerio.load(arrayBuffer.toString("binary"));
+          const handled = handleHtmlData(data);
+          if (Object.keys(handled).length === 0) {
+            resolve(cepNotFound(cep));
+          }
+          resolve(handled);
+        } else {
+          console.log(err); //eslint-disable-line no-console
           reject(unableToFindCep(cep));
         }
-        const data = cheerio.load(response.body);
-        const handled = handleHtmlData(data);
-        if (Object.keys(handled).length === 0) {
-          resolve(cepNotFound(cep));
-        }
-        resolve(handled);
       });
   });
 };
 
 const getAddressFromService = cep => {
   return new Promise((resolve, reject) => {
-    const form = new FormData();
-    form.append("semelhante", "N");
-    form.append("tipoCEP", "ALL");
-    form.append('relaxation', cep);
-    const cepToFind = {};
-    cepToFind[cepKey] = cep;
-    got(postalCodeServiceUrl(cep))
-      .then(response => {
-        if (response.statusCode != 200) {
-          reject(unableToFindCep(cep));
-        }
-        const result = JSON.parse(response.body);
-        if (result.erro) {
-          resolve(cepNotFound(cep));
-        }
-        const handled = {};
-        handled[map[0]] = result[map[0]];
-        handled[map[1]] = result[map[1]];
-        handled[map[2]] = result['localidade'];
-        handled[map[3]] = result[map[3]];
-        handled[map[4]] = result['uf'];
-        handled[map[5]] = result[map[5]];
-        resolve(handled);
-      });
+    axios.get(postalCodeServiceUrl(cep)).then((response) => {
+      const result = response.data;
+      if (response.status != 200) {
+        reject(unableToFindCep(cep));
+      }
+      if (result.erro) {
+        resolve(cepNotFound(cep));
+      }
+      const handled = {};
+      handled[map[0]] = result[map[0]];
+      handled[map[1]] = result[map[1]];
+      handled[map[2]] = result['localidade'];
+      handled[map[3]] = result[map[3]];
+      handled[map[4]] = result['uf'];
+      handled[map[5]] = result[map[5]];
+      resolve(handled);
+    });
   });
 };
 
