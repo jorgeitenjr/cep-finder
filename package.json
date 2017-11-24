@@ -4,13 +4,13 @@
   "description": "Easy CEP (brazilian postal code) finder",
   "main": "src/index.js",
   "dependencies": {
+    "axios": "^0.17.1",
     "cheerio": "^1.0.0-rc.2",
     "detect-node": "^2.0.3",
     "form-data": "^2.3.1",
-    "got": "^8.0.0"
+    "qs": "^6.5.1"
   },
   "devDependencies": {
-    "babel-register": "6.16.3",
     "chai": "^4.1.2",
     "eslint": "^4.11.0",
     "eslint-watch": "^3.1.3",
