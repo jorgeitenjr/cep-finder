@@ -15,7 +15,7 @@ const regExp = new RegExp(pattern);
 const cepNotFound = cep => {
   return {message: `CEP ${cep} não encontrado.`};
 };
-const invalidValid = cep => {
+const invalidCep = cep => {
   return {message: `CEP ${cep} inválido.`};
 };
 const unableToFindCep = cep => {
@@ -80,7 +80,7 @@ const getAddress = async (cep, type) =>
         await getAddressFromService(cep)
         : await getAddressHtml(cep)
       : await getAddressFromService(cep)
-    : invalidValid(cep);
+    : invalidCep(cep);
 
 
 const getAddressHtml = cep => {
